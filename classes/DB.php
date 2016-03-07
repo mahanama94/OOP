@@ -35,14 +35,14 @@ class DB{
 	
 	
 	/**
-	 *
+	 * returns the status of error correspoding to the query
 	 */
 	public function error(){
 		return $this->_error;
 	}
 	
 	/**
-	 * 
+	 * returns the count of the query
 	 */
 	public function count(){
 		return $this->_count;
@@ -64,11 +64,12 @@ class DB{
 					
 					$this->_query->bindValue($x, $param);
 					$x++;
-					
 				}
+				
+				
 			}
 			
-			
+			echo var_dump($this->_query);
 			if($this->_query->execute()){
 				$this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
 				$this->_count = $this->_query->rowCount();				
@@ -131,5 +132,40 @@ class DB{
 	 */
 	public function delete($table, $where = array()){
 		return $this->action("DELETE ", $table,$conditions );
+	}
+	
+	/**
+	 * Inserts data in to the database corresponding to the table provided as parameters
+	 * 
+	 * ex
+	 * 		insert('users', array('username' => 'Dale','password' => 'password','salt' => 'salt'))
+	 * 
+	 * @param  corresponding table $table
+	 * @param values for the fields as an associative array $fields
+	 * @return true on success else false boolean
+	 */
+	public function insert($table, $fields = array()){
+		if(count($fields)){
+			$keys = array_keys( $fields);
+			$values = null;
+			$x = 1;
+			
+			foreach($fields as $filed){
+				$values .= " ? ";
+				if($x< count($fields)){
+					$values .=", ";
+				}
+				$x++;
+			}
+			
+			$sql = "INSERT INTO $table ( ".implode(" , ", $keys) .") VALUES ({$values})";
+			
+			//echo $sql;
+			//echo var_dump($fields);
+			if(!$this->query($sql, $fields)->error()){
+				return true;
+			}
+		}
+		return false; 
 	}
 }
