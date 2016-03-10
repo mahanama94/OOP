@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Database wrapper class 
+ * provides the functionality of querying from the database through a PDO
+ * Provides database connecitivity to the database configured in Config.php
+ * using the credentials provided 
+ * 
+ * Last update on 08/03/2015
+ * 
+ * @author Rajith Bhanuka
+ *
+ */
 class DB{
 	
 	private static $_instance = null;
@@ -8,6 +19,7 @@ class DB{
 			$_error = false , 
 			$_result, 
 			$_count =0;
+	
 	
 	/**
 	 * Constructor - Singleton
@@ -20,6 +32,7 @@ class DB{
 			die($e->getMessage());
 		}
 	}
+	
 	
 	/**
 	 * returns the DB instance if available
@@ -49,6 +62,13 @@ class DB{
 	}
 	
 	/**
+	 * Returns the result of the query perdormed
+	 */
+	public function result(){
+		return $this->_result;
+	}
+	
+	/**
 	 * 
 	 * @param unknown $sql
 	 * @param array $params
@@ -69,7 +89,7 @@ class DB{
 				
 			}
 			
-			echo var_dump($this->_query);
+			//echo var_dump($this->_query);
 			if($this->_query->execute()){
 				$this->_result = $this->_query->fetchAll(PDO::FETCH_OBJ);
 				$this->_count = $this->_query->rowCount();				
@@ -168,4 +188,44 @@ class DB{
 		}
 		return false; 
 	}
+	
+	/**
+	 * updates data in the table in the database provided as parameters
+	 * 
+	 * ex 
+	 * 		update('users', " username = 'alex' ", array('password' => 'bla'));
+	 * 
+	 * @param table name $table
+	 * @param condition(s) $condition
+	 * @param values for the fields as an associative array $fields
+	 * @return true on success else false boolean
+	 */
+	public function update($table, $condition = "", $fields = array()){
+		
+		$set = "";
+		$x = 1;
+		foreach($fields as $name=>$value){
+			$set .= " $name = ? ";
+			if($x < count($fields)){
+				$set .= " , ";
+			}
+			$x++;
+		}
+		
+		$sql = "UPDATE $table SET $set ";
+		
+		if(!$condition == ""){
+			$sql .=" WHERE $condition";
+		}
+		
+		echo $sql;
+		
+		if(!$this->query($sql,$fields)->error()){
+			return true;
+		}
+		return false;
+		
+		
+	}
 }
+?>

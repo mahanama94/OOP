@@ -12,8 +12,21 @@ else{
 	echo "User";
 }*/
 
-$user = DB::getInstance()->insert('users', array('username' => 'Dale','password' => 'password','salt' => 'salt'));
+//$user = DB::getInstance()->insert('users', array('username' => 'Billy','password' => 'password2','salt' => 'salt2'));
 
 //$user = DB::getInstance()->query($sql)
-echo var_dump($user);
+//echo var_dump($user);
+
+$users = DB::getInstance()->update('users', " username = 'alex' ", array('password' => 'bla'));
+
+echo var_dump($users);
+/*if(!$users->count()){
+	echo "No user";
+}
+else{
+	foreach($users->result() as $user){
+		echo $user->username, ',<br>';	
+	}
+}*/
+
 ?>
